@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="500.0" prefWidth="800.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="br.com.devmedia.agenda.controller.ContatoOverviewController">
+  <children>
+    <SplitPane dividerPositions="0.49125" focusTraversable="false" prefHeight="300.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <items>
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+          <children>
+            <TableView fx:id="contatoTable" prefHeight="298.0" prefWidth="175.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+              <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+              </columnResizePolicy>
+              <columns>
+                <TableColumn prefWidth="102.0" text="Nome" fx:id="nomeColumn" />
+                <TableColumn prefWidth="114.0" text="Dt. Nascimento" fx:id="dataNascimentoColumn" />
+              </columns>
+            </TableView>
+          </children>
+        </AnchorPane>
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="298.0" prefWidth="393.0" styleClass="background">
+          <children>
+            <Label styleClass="label-header" text="Detalhe Contato" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0" />
+            <GridPane AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="80.0">
+              <children>
+                <Label text="Nome" />
+                <Label fx:id="nomeLabel" styleClass="label-bright" text="Label" GridPane.columnIndex="1" />
+                <Label text="Dt. Nascimento" GridPane.rowIndex="1" />
+                <Label fx:id="dataNascimentoLabel" styleClass="label-bright" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                <Label text="Endereco" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                <Label fx:id="enderecoLabel" styleClass="label-bright" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                <Label text="Complemento" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                <Label fx:id="complementoLabel" styleClass="label-bright" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                <Label text="Cep" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                <Label fx:id="cepLabel" styleClass="label-bright" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                <Label text="Numero" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+                <Label fx:id="numeroLabel" styleClass="label-bright" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+              </children>
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+            </GridPane>
+            <HBox spacing="5.0" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="10.0">
+              <children>
+                <Button mnemonicParsing="false" onAction="#handleNewContato" prefWidth="90.0" text="Novo" />
+                <Button mnemonicParsing="false" onAction="#handleEditContato" prefWidth="90.0" text="Editar" />
+                <Button mnemonicParsing="false" onAction="#handleDeleteContato" prefWidth="90.0" text="Deletar" />
+              </children>
+            </HBox>
+            <TableView fx:id="telefoneTable" layoutX="9.0" layoutY="272.0" prefHeight="180.0" prefWidth="-1.0">
+              <columns>
+                <TableColumn prefWidth="85.0" text="DDD" fx:id="dddColumn" />
+                <TableColumn minWidth="290.0" prefWidth="290.0" text="Número" fx:id="numeroColumn" />
+              </columns>
+            </TableView>
+          </children>
+        </AnchorPane>
+      </items>
+    </SplitPane>
+  </children>
+  <stylesheets>
+    <URL value="@DarkTheme.css" />
+  </stylesheets>
+</AnchorPane>
