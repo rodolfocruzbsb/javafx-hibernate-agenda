@@ -99,7 +99,7 @@ public class ContatoCrudController {
 
 		this.dataNascimentoField.setText(contato.getDataNascimentoString());
 
-		if (contato != null && contato.getId() != null) {
+		if (contato != null) {
 
 			this.preencherEndereco();
 
@@ -109,8 +109,7 @@ public class ContatoCrudController {
 
 	private void preencherEndereco() {
 
-		if (this.contato != null && this.contato.getEndereco() != null) {
-			this.descricaoField.setText(this.contato.getEndereco().getDescricao());
+		if (this.contato != null ) {
 			this.descricaoField.textProperty().bindBidirectional(this.contato.getEndereco().getDescricaoProperty());
 			this.complementoField.textProperty().bindBidirectional(this.contato.getEndereco().getComplementoProperty());
 			this.cepField.textProperty().bindBidirectional(this.contato.getEndereco().getCepProperty());
@@ -231,15 +230,28 @@ public class ContatoCrudController {
 		final TelefoneDTO item = this.telefoneTable.getSelectionModel().getSelectedItem();
 
 		if (item != null) {
+
 			final Alert alert = new Alert(AlertType.CONFIRMATION);
+
 			alert.setTitle("Confirmação");
+
 			alert.setHeaderText("Você está prestes a excluir o registro.");
+
 			alert.setContentText("Deseja continuar esta operação?");
 
 			final Optional<ButtonType> result = alert.showAndWait();
+
 			if (result.get() == ButtonType.OK) {
-				this.facade.excluirTelefone(item.getEntidade());
-				this.telefoneTable.getItems().remove(item);
+
+				try {
+
+					this.facade.excluirTelefone(item.getEntidade());
+					this.telefoneTable.getItems().remove(item);
+				} catch (Exception e) {
+
+					this.mainApp.alertException(e);
+				}
+
 			}
 
 		} else {

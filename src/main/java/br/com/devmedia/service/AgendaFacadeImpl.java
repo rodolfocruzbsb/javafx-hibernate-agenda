@@ -1,11 +1,11 @@
 package br.com.devmedia.service;
 
+import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 
 import br.com.devmedia.agenda.model.dao.ContatoDao;
-import br.com.devmedia.agenda.model.dao.GrupoDao;
 import br.com.devmedia.agenda.model.dao.TelefoneDao;
 import br.com.devmedia.agenda.model.entidades.Contato;
 import br.com.devmedia.agenda.model.entidades.Telefone;
@@ -15,48 +15,47 @@ public class AgendaFacadeImpl implements AgendaFacade {
 
 	private EntityManager entityManager;
 
-	private ContatoDao contatoDao;
+	private final ContatoDao contatoDao;
 
-	private GrupoDao grupoDao;
-
-	private TelefoneDao telefoneDao;
+	private final TelefoneDao telefoneDao;
 
 	public AgendaFacadeImpl() {
 
 		this.setEntityManager(FabricaDeEntityManager.getEntityManager());
 
-		this.contatoDao = new ContatoDao(getEntityManager());
+		this.contatoDao = new ContatoDao(this.getEntityManager());
 
-		this.telefoneDao = new TelefoneDao(getEntityManager());
+		this.telefoneDao = new TelefoneDao(this.getEntityManager());
 
-		this.grupoDao = new GrupoDao(getEntityManager());
 	}
 
 	@Override
 	public List<Contato> buscarTodosContatos() {
 
-		this.getContatoDao().getEntityManager().clear();
+		this.clear();
 
-		return this.getContatoDao().buscarTodos();
+		return this.contatoDao.buscarTodos();
 	}
 
 	@Override
-	public void salvarContato(Contato contato) {
+	public void salvarContato(final Contato contato) {
 
 		try {
 
 			this.beginTransaction();
+
+			// Vinculando os contatos
+			if (contato.getTelefones() != null) {
+
+				contato.getTelefones().stream().forEach(t -> t.setContato(contato));
+
+			}
 
 			this.contatoDao.salvar(contato);
 
-			if (contato.getTelefones() != null) {
-
-				contato.getTelefones().stream().forEach(t -> telefoneDao.salvar(t));
-			}
-
 			this.commitTransaction();
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 
 			this.rollbackTransaction();
 
@@ -66,17 +65,21 @@ public class AgendaFacadeImpl implements AgendaFacade {
 	}
 
 	@Override
-	public void excluirTelefone(Telefone telefone) {
+	public void excluirTelefone(final Telefone telefone) {
 
 		try {
+			if (telefone != null && telefone.getId() != null) {
 
-			this.beginTransaction();
+				this.beginTransaction();
 
-			this.telefoneDao.excluir(telefone.getId());
+				final Telefone telefoneParaExclusao = this.telefoneDao.selecionarPorId(telefone.getId());
 
-			this.commitTransaction();
+				this.telefoneDao.excluir(telefoneParaExclusao.getId());
 
-		} catch (Exception e) {
+				this.commitTransaction();
+
+			}
+		} catch (final Exception e) {
 
 			this.rollbackTransaction();
 
@@ -85,24 +88,30 @@ public class AgendaFacadeImpl implements AgendaFacade {
 
 	}
 
-	/**
-	 * Retorna o valor do atributo <code>contatoDao</code>
-	 *
-	 * @return <code>ContatoDao</code>
-	 */
-	public ContatoDao getContatoDao() {
+	public void excluirContato(final Contato contato) {
 
-		return contatoDao;
-	}
+		if (contato != null && contato.getId() != null) {
+			try {
 
-	/**
-	 * Define o valor do atributo <code>contatoDao</code>.
-	 *
-	 * @param contatoDao
-	 */
-	public void setContatoDao(ContatoDao contatoDao) {
+				this.beginTransaction();
 
-		this.contatoDao = contatoDao;
+				// Paso 1: Excluindo os telefones, poderia ser feito via cascade, porém desta forma ficou mais didático
+				final Collection<Telefone> telefoneParaExclusao = this.telefoneDao.buscarPorContato(contato);
+
+				telefoneParaExclusao.stream().forEach(t -> this.telefoneDao.excluir(t.getId()));
+
+				// Passo Final: Excluindo Contato, o Endereço será excluído em cascada juntamente
+				this.contatoDao.excluir(contato.getId());
+
+				this.commitTransaction();
+			} catch (Exception e) {
+
+				this.rollbackTransaction();
+
+				throw e;
+			}
+		}
+
 	}
 
 	/**
@@ -110,9 +119,9 @@ public class AgendaFacadeImpl implements AgendaFacade {
 	 *
 	 * @return <code>EntityManager</code>
 	 */
-	public EntityManager getEntityManager() {
+	private EntityManager getEntityManager() {
 
-		return entityManager;
+		return this.entityManager;
 	}
 
 	/**
@@ -120,22 +129,22 @@ public class AgendaFacadeImpl implements AgendaFacade {
 	 *
 	 * @param entityManager
 	 */
-	public void setEntityManager(EntityManager entityManager) {
+	private void setEntityManager(final EntityManager entityManager) {
 
 		this.entityManager = entityManager;
 	}
 
-	public void beginTransaction() {
+	private void beginTransaction() {
 
 		this.getEntityManager().getTransaction().begin();
 	}
 
-	public void commitTransaction() {
+	private void commitTransaction() {
 
 		this.getEntityManager().getTransaction().commit();
 	}
 
-	public void rollbackTransaction() {
+	private void rollbackTransaction() {
 
 		this.getEntityManager().getTransaction().rollback();
 	}

@@ -59,7 +59,7 @@ public class Contato extends Entidade {
 	@JoinColumn(name = "fk_endereco", unique = true)
 	private Endereco endereco;
 
-	@OneToMany(mappedBy = "contato", orphanRemoval = true)
+	@OneToMany(mappedBy = "contato", cascade = CascadeType.ALL)
 	private Collection<Telefone> telefones;
 
 	@ManyToMany

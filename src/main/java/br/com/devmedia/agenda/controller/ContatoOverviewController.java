@@ -149,7 +149,8 @@ public class ContatoOverviewController {
 
 			final Optional<ButtonType> result = alert.showAndWait();
 			if (result.get() == ButtonType.OK) {
-				System.out.println("Excluiu!!!");
+				this.facade.excluirContato(selectedContato.getContato());
+				this.contatoTable.getItems().remove(selectedContato);
 			}
 
 		} else {

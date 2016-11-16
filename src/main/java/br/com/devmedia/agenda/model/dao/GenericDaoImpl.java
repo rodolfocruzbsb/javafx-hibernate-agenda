@@ -1,6 +1,7 @@
 package br.com.devmedia.agenda.model.dao;
 
 import java.lang.reflect.ParameterizedType;
+import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -54,12 +55,11 @@ public abstract class GenericDaoImpl<T extends Entidade> implements GenericDao<T
 
 		this.verificaParametroID(id);
 
-		final T entity = this.selecionarPorId(id);
+		final Query query = this.getEntityManager().createQuery("delete from " + this.clazz.getName() + " t where t.id = :id");
 
-		if (entity != null) {
+		query.setParameter("id", id);
 
-			this.getEntityManager().remove(entity);
-		}
+		query.executeUpdate();
 
 	}
 
@@ -75,6 +75,15 @@ public abstract class GenericDaoImpl<T extends Entidade> implements GenericDao<T
 		}
 
 		return entity;
+	}
+
+	@Override
+	public void salvar(final Collection<T> itens) {
+
+		if (itens != null) {
+
+			itens.stream().forEach(this::salvar);
+		}
 	}
 
 	@Override
