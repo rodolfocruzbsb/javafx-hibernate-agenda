@@ -8,6 +8,7 @@ import br.com.devmedia.agenda.model.dao.ContatoDao;
 import br.com.devmedia.agenda.model.dao.GrupoDao;
 import br.com.devmedia.agenda.model.dao.TelefoneDao;
 import br.com.devmedia.agenda.model.entidades.Contato;
+import br.com.devmedia.agenda.model.entidades.Telefone;
 import br.com.devmedia.agenda.util.FabricaDeEntityManager;
 
 public class AgendaFacadeImpl implements AgendaFacade {
@@ -42,25 +43,43 @@ public class AgendaFacadeImpl implements AgendaFacade {
 	@Override
 	public void salvarContato(Contato contato) {
 
-
 		try {
-			this.contatoDao.getEntityManager().getTransaction().begin();
-			this.contatoDao.salvar(contato);
-			this.contatoDao.getEntityManager().getTransaction().commit();
 
-			if (contato != null) {
-				System.out.println(contato);
-				
-				if (contato.getTelefones() != null)
-					contato.getTelefones().stream().forEach(System.out::println);
-				
-				if (contato.getGrupos() != null)
-					contato.getGrupos().stream().forEach(System.out::println);
+			this.beginTransaction();
+
+			this.contatoDao.salvar(contato);
+
+			if (contato.getTelefones() != null) {
+
+				contato.getTelefones().stream().forEach(t -> telefoneDao.salvar(t));
 			}
-			
+
+			this.commitTransaction();
+
 		} catch (Exception e) {
 
-			this.contatoDao.getEntityManager().getTransaction().rollback();
+			this.rollbackTransaction();
+
+			throw e;
+		}
+
+	}
+
+	@Override
+	public void excluirTelefone(Telefone telefone) {
+
+		try {
+
+			this.beginTransaction();
+
+			this.telefoneDao.excluir(telefone.getId());
+
+			this.commitTransaction();
+
+		} catch (Exception e) {
+
+			this.rollbackTransaction();
+
 			throw e;
 		}
 

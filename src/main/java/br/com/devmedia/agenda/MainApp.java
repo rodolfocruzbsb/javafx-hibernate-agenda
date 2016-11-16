@@ -143,9 +143,11 @@ public class MainApp extends Application {
 	
 	public void alertException( Exception ex){
 		Alert alert = new Alert(AlertType.ERROR);
-		alert.setTitle("Exception Dialog");
-		alert.setHeaderText("Look, an Exception Dialog");
-		alert.setContentText("Could not find file blabla.txt!");
+		alert.setTitle("Erro");
+		alert.setHeaderText("Ops! Algo inesperado aconteceu");
+		alert.setContentText(null);
+		
+		alert.getDialogPane().setPrefWidth(500);
 
 		// Create expandable Exception.
 		StringWriter sw = new StringWriter();
@@ -153,7 +155,7 @@ public class MainApp extends Application {
 		ex.printStackTrace(pw);
 		String exceptionText = sw.toString();
 
-		Label label = new Label("The exception stacktrace was:");
+		Label label = new Label("Stacktrace do erro:");
 
 		TextArea textArea = new TextArea(exceptionText);
 		textArea.setEditable(false);

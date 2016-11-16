@@ -149,9 +149,9 @@ public class ContatoCrudController {
 			if (this.validarContato()) {
 
 				final Contato entidade = this.contato.getEntidadeSincronizada();
-			
+
 				this.facade.salvarContato(entidade);
-				
+
 				this.mainApp.showContatoOverview();
 			}
 		} catch (Exception e) {
@@ -228,9 +228,9 @@ public class ContatoCrudController {
 	@FXML
 	private void handleDeletarTelefone() {
 
-		final int index = this.telefoneTable.getSelectionModel().getSelectedIndex();
+		final TelefoneDTO item = this.telefoneTable.getSelectionModel().getSelectedItem();
 
-		if (index >= 0) {
+		if (item != null) {
 			final Alert alert = new Alert(AlertType.CONFIRMATION);
 			alert.setTitle("Confirmação");
 			alert.setHeaderText("Você está prestes a excluir o registro.");
@@ -238,7 +238,8 @@ public class ContatoCrudController {
 
 			final Optional<ButtonType> result = alert.showAndWait();
 			if (result.get() == ButtonType.OK) {
-				this.telefoneTable.getItems().remove(index);
+				this.facade.excluirTelefone(item.getEntidade());
+				this.telefoneTable.getItems().remove(item);
 			}
 
 		} else {
