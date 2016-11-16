@@ -8,7 +8,7 @@
 	<description>Projeto utilizando JavaFX + Hibernate</description>
 	<dependencies>
 
-		<!-- JPA -->
+		<!-- JPA - Hibernate-->
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
@@ -22,7 +22,7 @@
 			<version>5.2.4.Final</version>
 		</dependency>
 
-		<!-- Hibernate -->
+		<!-- Postgre -->
 		<dependency>
 			<groupId>postgresql</groupId>
 			<artifactId>postgresql</artifactId>
