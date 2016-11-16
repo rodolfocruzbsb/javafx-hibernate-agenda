@@ -10,6 +10,7 @@ import br.com.devmedia.agenda.controller.dto.ContatoDTO;
 import br.com.devmedia.agenda.controller.dto.TelefoneDTO;
 import br.com.devmedia.agenda.model.entidades.Contato;
 import br.com.devmedia.agenda.util.DateUtil;
+import br.com.devmedia.service.AgendaFacade;
 import br.com.devmedia.service.AgendaFacadeImpl;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -66,7 +67,9 @@ public class ContatoOverviewController {
 
 	private final ObservableList<ContatoDTO> contatos = FXCollections.observableArrayList();
 
-	private AgendaFacadeImpl facade;
+	private AgendaFacade facade;
+
+	@FXML Label grupoLabel;
 
 	public ContatoOverviewController() {
 		this.facade = new AgendaFacadeImpl();
@@ -101,6 +104,7 @@ public class ContatoOverviewController {
 
 		this.detalharContatoSelecionado(null);
 
+		//Evento de selecionar o item na tabela
 		this.contatoTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> this.detalharContatoSelecionado(newValue));
 	}
 
@@ -123,8 +127,10 @@ public class ContatoOverviewController {
 
 			final ObservableList<TelefoneDTO> telefoneData = FXCollections.observableArrayList();
 			telefoneData.addAll(contato.getTelefones());
-
 			this.telefoneTable.setItems(telefoneData);
+
+			this.grupoLabel.setText(contato.getGrupos().stream().map(g -> g.getNome()).collect(Collectors.joining("; ")));
+			contato.getGrupos();
 		} else {
 
 			this.nomeLabel.setText("");
@@ -133,6 +139,7 @@ public class ContatoOverviewController {
 			this.complementoLabel.setText("");
 			this.cepLabel.setText("");
 			this.numeroLabel.setText("");
+			this.grupoLabel.setText("");
 		}
 	}
 
@@ -183,7 +190,7 @@ public class ContatoOverviewController {
 	private void carregarContatosDoBanco() {
 
 		final List<Contato> contatosEntity = this.facade.buscarTodosContatos();
-
+		
 		this.enviarContatosParaTela(contatosEntity);
 
 	}

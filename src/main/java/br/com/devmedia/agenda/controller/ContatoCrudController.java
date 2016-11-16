@@ -4,8 +4,10 @@ import java.util.Optional;
 
 import br.com.devmedia.agenda.MainApp;
 import br.com.devmedia.agenda.controller.dto.ContatoDTO;
+import br.com.devmedia.agenda.controller.dto.GrupoDTO;
 import br.com.devmedia.agenda.controller.dto.TelefoneDTO;
 import br.com.devmedia.agenda.model.entidades.Contato;
+import br.com.devmedia.agenda.model.entidades.Grupo;
 import br.com.devmedia.agenda.util.DateUtil;
 import br.com.devmedia.agenda.util.FieldsUtils;
 import br.com.devmedia.service.AgendaFacadeImpl;
@@ -15,9 +17,12 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.util.StringConverter;
 
 public class ContatoCrudController {
 
@@ -43,22 +48,34 @@ public class ContatoCrudController {
 	private TableView<TelefoneDTO> telefoneTable;
 
 	@FXML
+	private TableView<GrupoDTO> grupoTable;
+
+	@FXML
 	private TableColumn<TelefoneDTO, String> dddColumn;
 
 	@FXML
 	private TableColumn<TelefoneDTO, String> numeroColumn;
 
 	@FXML
-	TextField dddTelefoneField;
+	private TableColumn<GrupoDTO, String> grupoNomeColumn;
 
 	@FXML
-	TextField numeroTelefoneField;
+	private TableColumn<GrupoDTO, String> grupoDescricaoColumn;
+
+	@FXML
+	private TextField dddTelefoneField;
+
+	@FXML
+	private TextField numeroTelefoneField;
 
 	private MainApp mainApp;
 
 	private ContatoDTO contato;
 
 	private AgendaFacadeImpl facade;
+
+	@FXML
+	private ComboBox<Grupo> grupoCombobox;
 
 	public ContatoCrudController() {
 
@@ -71,6 +88,10 @@ public class ContatoCrudController {
 		this.dddColumn.setCellValueFactory(cellData -> cellData.getValue().getDddStringProperty());
 
 		this.numeroColumn.setCellValueFactory(cellData -> cellData.getValue().getNumeroStringProperty());
+
+		this.grupoNomeColumn.setCellValueFactory(cellData -> cellData.getValue().getNomeProperty());
+
+		this.grupoDescricaoColumn.setCellValueFactory(cellData -> cellData.getValue().getDescricaoProperty());
 
 		FieldsUtils.numericField(this.numeroField);
 		FieldsUtils.maxField(this.numeroField, 9);
@@ -93,26 +114,29 @@ public class ContatoCrudController {
 
 	}
 
-	private void showContatoDetails(final ContatoDTO contato) {
+	private void showContatoDetails() {
 
-		this.nomeField.textProperty().bindBidirectional(contato.getNomeProperty());
+		this.nomeField.textProperty().bindBidirectional(this.contato.getNomeProperty());
 
-		this.dataNascimentoField.setText(contato.getDataNascimentoString());
+		this.dataNascimentoField.setText(this.contato.getDataNascimentoString());
 
-		if (contato != null) {
+		this.preencherEndereco();
 
-			this.preencherEndereco();
+		this.preencherTelefones();
 
-			this.preencherTelefones();
-		}
+		this.preencherGrupos();
 	}
 
 	private void preencherEndereco() {
 
-		if (this.contato != null ) {
+		if (this.contato != null) {
+
 			this.descricaoField.textProperty().bindBidirectional(this.contato.getEndereco().getDescricaoProperty());
+
 			this.complementoField.textProperty().bindBidirectional(this.contato.getEndereco().getComplementoProperty());
+
 			this.cepField.textProperty().bindBidirectional(this.contato.getEndereco().getCepProperty());
+
 			this.numeroField.textProperty().bindBidirectional(this.contato.getEndereco().getNumeroProperty());
 
 		}
@@ -127,11 +151,77 @@ public class ContatoCrudController {
 
 				&& !this.contato.getTelefones().isEmpty()) {
 
-			final ObservableList<TelefoneDTO> telefoneData = FXCollections.observableArrayList();
+			final ObservableList<TelefoneDTO> telefoneItens = FXCollections.observableArrayList();
 
-			telefoneData.addAll(this.contato.getTelefones());
+			telefoneItens.addAll(this.contato.getTelefones());
 
-			this.telefoneTable.setItems(telefoneData);
+			this.telefoneTable.setItems(telefoneItens);
+		}
+
+	}
+
+	private class GrupoChooserConverter<T> extends StringConverter<Grupo> {
+
+		@Override
+		public Grupo fromString(final String grupo) {
+
+			// This is the important code!
+			return null;
+		}
+
+		@Override
+		public String toString(final Grupo grupo) {
+
+			if (grupo == null) {
+				return null;
+			}
+			return grupo.getNome();
+		}
+	}
+
+	private void preencherGrupos() {
+
+		// preenche combobox
+		final ObservableList<Grupo> grupoItens = FXCollections.observableArrayList();
+
+		grupoItens.addAll(this.facade.buscarTodosGrupos());
+
+		this.grupoCombobox.setItems(grupoItens);
+
+		this.grupoCombobox.setCellFactory((comboBox) -> {
+			return new ListCell<Grupo>() {
+
+				@Override
+				protected void updateItem(Grupo item, boolean empty) {
+
+					super.updateItem(item, empty);
+
+					if (item == null || empty) {
+						setText(null);
+					} else {
+						setText(item.getId() + " - " + item.getNome());
+					}
+				}
+			};
+		});
+		
+		this.grupoCombobox.setConverter(new GrupoChooserConverter<>());
+		
+		//StringConverter<Grupo> converter = this.grupoCombobox.getConverter();
+
+		
+
+		if (this.contato != null
+
+				&& this.contato.getGrupos() != null
+
+				&& !this.contato.getGrupos().isEmpty()) {
+
+			final ObservableList<GrupoDTO> grupoDTOItens = FXCollections.observableArrayList();
+
+			grupoDTOItens.addAll(this.contato.getGrupos());
+
+			this.grupoTable.setItems(grupoDTOItens);
 		}
 
 	}
@@ -144,6 +234,8 @@ public class ContatoCrudController {
 			this.contato.setDataNascimento(DateUtil.parse(this.dataNascimentoField.getText()));
 
 			this.contato.setTelefones(telefoneTable.getItems());
+
+			this.contato.setGrupos(grupoTable.getItems());
 
 			if (this.validarContato()) {
 
@@ -307,6 +399,88 @@ public class ContatoCrudController {
 
 	}
 
+	@FXML
+	private void handleDeletarGrupo() {
+
+		final int index = this.grupoTable.getSelectionModel().getSelectedIndex();
+
+		if (index >= 0) {
+
+			final Alert alert = new Alert(AlertType.CONFIRMATION);
+
+			alert.setTitle("Confirmação");
+
+			alert.setHeaderText("Você está prestes a excluir o registro.");
+
+			alert.setContentText("Deseja continuar esta operação?");
+
+			final Optional<ButtonType> result = alert.showAndWait();
+
+			if (result.get() == ButtonType.OK) {
+
+				this.grupoTable.getItems().remove(index);
+
+			}
+
+		} else {
+
+			this.mainApp.alertNenhumItemSelecionado();
+		}
+	}
+
+	@FXML
+	public void handleAdicionarGrupo() {
+
+		if (this.validarDadosGrupo()) {
+
+			final Grupo grupo = this.grupoCombobox.getSelectionModel().getSelectedItem();
+
+			this.grupoTable.getItems().add(new GrupoDTO(grupo, grupo.getNome(), grupo.getDescricao()));
+		}
+
+	}
+
+	private boolean validarDadosGrupo() {
+
+		final StringBuilder msgValidacao = new StringBuilder();
+		Grupo selected = this.grupoCombobox.getSelectionModel().getSelectedItem();
+
+		if (selected == null || selected.getId() == null) {
+
+			msgValidacao.append("Selecione o grupo...").append("\n");
+		} else {
+
+			boolean jaExiste = this.grupoTable.getItems().stream().filter(g -> selected.getId().equals(g.getEntidade().getId())).count() > 0;
+
+			if (jaExiste) {
+
+				msgValidacao.append("Este grupo já foi adicionado!").append("\n");
+			}
+		}
+
+		if (msgValidacao.length() > 0) {
+
+			final Alert alert = new Alert(AlertType.ERROR);
+
+			alert.setTitle("Erro");
+
+			alert.setHeaderText("Foram encontrados ao adicionar o item");
+
+			alert.setContentText(msgValidacao.toString());
+
+			alert.setResizable(true);
+
+			alert.getDialogPane().setPrefWidth(500);
+
+			alert.showAndWait();
+
+			return false;
+		}
+
+		return true;
+
+	}
+
 	public void setContrato(final ContatoDTO contato) {
 
 		this.contato = contato;
@@ -315,7 +489,7 @@ public class ContatoCrudController {
 
 	public void recarregarPagina() {
 
-		this.showContatoDetails(this.contato);
+		this.showContatoDetails();
 	}
 
 	public TextField getNomeField() {
@@ -376,6 +550,26 @@ public class ContatoCrudController {
 	public void setComplementoField(final TextField complementoField) {
 
 		this.complementoField = complementoField;
+	}
+
+	/**
+	 * Retorna o valor do atributo <code>grupoCombobox</code>
+	 *
+	 * @return <code>ComboBox<Grupo></code>
+	 */
+	public ComboBox<Grupo> getGrupoCombobox() {
+
+		return grupoCombobox;
+	}
+
+	/**
+	 * Define o valor do atributo <code>grupoCombobox</code>.
+	 *
+	 * @param grupoCombobox
+	 */
+	public void setGrupoCombobox(ComboBox<Grupo> grupoCombobox) {
+
+		this.grupoCombobox = grupoCombobox;
 	}
 
 }

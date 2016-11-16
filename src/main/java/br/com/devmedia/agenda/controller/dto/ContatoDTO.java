@@ -18,11 +18,13 @@ public class ContatoDTO {
 
 	private final StringProperty nome = new SimpleStringProperty();
 
-	private final ObjectProperty<LocalDate> dataNascimento = new SimpleObjectProperty<LocalDate>();
+	private final ObjectProperty<LocalDate> dataNascimento = new SimpleObjectProperty<>();
 
 	private EnderecoDTO endereco;
 
 	private List<TelefoneDTO> telefones;
+
+	private List<GrupoDTO> grupos;
 
 	private Contato contato;
 
@@ -41,54 +43,54 @@ public class ContatoDTO {
 
 	public LocalDate getDataNascimento() {
 
-		return dataNascimento.get();
+		return this.dataNascimento.get();
 	}
 
-	public void setDataNascimento(LocalDate dataNascimento) {
+	public void setDataNascimento(final LocalDate dataNascimento) {
 
 		this.dataNascimento.set(dataNascimento);
 	}
 
 	public StringProperty getDataNascimentoStringProperty() {
 
-		return new SimpleStringProperty(DateUtil.format(dataNascimento.get()));
+		return new SimpleStringProperty(DateUtil.format(this.dataNascimento.get()));
 	}
 
 	public String getDataNascimentoString() {
 
-		final String result = DateUtil.format(dataNascimento.get());
+		final String result = DateUtil.format(this.dataNascimento.get());
 
 		return result != null ? result : "";
 	}
 
 	public ObjectProperty<LocalDate> getDataNascimentoProperty() {
 
-		return dataNascimento;
+		return this.dataNascimento;
 	}
 
 	public String getNome() {
 
-		return nome.get();
+		return this.nome.get();
 	}
 
 	public StringProperty getNomeProperty() {
 
-		return nome;
+		return this.nome;
 	}
 
-	public void setNome(String nome) {
+	public void setNome(final String nome) {
 
 		this.nome.set(nome);
 	}
 
 	public EnderecoDTO getEndereco() {
-		
-		if(endereco == null){
-			
-			endereco = new EnderecoDTO();
+
+		if (this.endereco == null) {
+
+			this.endereco = new EnderecoDTO();
 		}
 
-		return endereco;
+		return this.endereco;
 	}
 
 	public boolean temEndereco() {
@@ -102,7 +104,12 @@ public class ContatoDTO {
 		return this.telefones != null && !this.telefones.isEmpty();
 	}
 
-	public void setEndereco(EnderecoDTO endereco) {
+	private boolean temGrupo() {
+
+		return this.telefones != null && !this.telefones.isEmpty();
+	}
+
+	public void setEndereco(final EnderecoDTO endereco) {
 
 		this.endereco = endereco;
 	}
@@ -114,12 +121,27 @@ public class ContatoDTO {
 			this.telefones = new ArrayList<>();
 		}
 
-		return telefones;
+		return this.telefones;
 	}
 
-	public void setTelefones(List<TelefoneDTO> telefones) {
+	public void setTelefones(final List<TelefoneDTO> telefones) {
 
 		this.telefones = telefones;
+	}
+
+	public List<GrupoDTO> getGrupos() {
+
+		if (this.grupos == null) {
+
+			this.grupos = new ArrayList<>();
+		}
+
+		return this.grupos;
+	}
+
+	public void setGrupos(final List<GrupoDTO> grupos) {
+
+		this.grupos = grupos;
 	}
 
 	/**
@@ -129,7 +151,7 @@ public class ContatoDTO {
 	 */
 	public Long getId() {
 
-		return id;
+		return this.id;
 	}
 
 	/**
@@ -137,12 +159,12 @@ public class ContatoDTO {
 	 *
 	 * @param id
 	 */
-	public void setId(Long id) {
+	public void setId(final Long id) {
 
 		this.id = id;
 	}
 
-	public static ContatoDTO from(Contato contato) {
+	public static ContatoDTO from(final Contato contato) {
 
 		ContatoDTO result = null;
 
@@ -161,6 +183,11 @@ public class ContatoDTO {
 
 				result.setTelefones(TelefoneDTO.from(contato.getTelefones()));
 			}
+
+			if (contato.getGrupos() != null && !contato.getGrupos().isEmpty()) {
+
+				result.setGrupos(GrupoDTO.from(contato.getGrupos()));
+			}
 		}
 
 		return result;
@@ -173,7 +200,7 @@ public class ContatoDTO {
 	 */
 	public Contato getContato() {
 
-		return contato;
+		return this.contato;
 	}
 
 	/**
@@ -181,7 +208,7 @@ public class ContatoDTO {
 	 *
 	 * @param contato
 	 */
-	public void setContato(Contato contato) {
+	public void setContato(final Contato contato) {
 
 		this.contato = contato;
 	}
@@ -189,14 +216,18 @@ public class ContatoDTO {
 	public Contato getEntidadeSincronizada() {
 
 		this.contato = this.contato != null ? this.contato : new Contato();
-		
-		this.contato.setNome(getNome());
 
-		this.contato.setDataNascimento(DateUtil.from(getDataNascimento()));
+		this.contato.setNome(this.getNome());
+
+		this.contato.setDataNascimento(DateUtil.from(this.getDataNascimento()));
 
 		this.contato.setEndereco(this.temEndereco() ? this.endereco.getEntidadeSincronizada(this.contato) : null);
 
 		this.contato.setTelefones(this.temTelefone() ? this.telefones.stream().filter(t -> t.estaPreenchido()).map(t -> t.getEntidadeSincronizada(this.contato)).collect(Collectors.toList()) : null);
+
+		this.contato.setGrupos(this.temGrupo() ? this.grupos.stream().filter(g -> g.estaPreenchido()).map(g -> g.getEntidadeSincronizada()).collect(Collectors.toList()) : null);
+
 		return this.contato;
 	}
+
 }

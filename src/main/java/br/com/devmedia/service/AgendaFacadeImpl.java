@@ -6,8 +6,10 @@ import java.util.List;
 import javax.persistence.EntityManager;
 
 import br.com.devmedia.agenda.model.dao.ContatoDao;
+import br.com.devmedia.agenda.model.dao.GrupoDao;
 import br.com.devmedia.agenda.model.dao.TelefoneDao;
 import br.com.devmedia.agenda.model.entidades.Contato;
+import br.com.devmedia.agenda.model.entidades.Grupo;
 import br.com.devmedia.agenda.model.entidades.Telefone;
 import br.com.devmedia.agenda.util.FabricaDeEntityManager;
 
@@ -16,6 +18,8 @@ public class AgendaFacadeImpl implements AgendaFacade {
 	private EntityManager entityManager;
 
 	private final ContatoDao contatoDao;
+
+	private final GrupoDao grupoDao;
 
 	private final TelefoneDao telefoneDao;
 
@@ -26,6 +30,15 @@ public class AgendaFacadeImpl implements AgendaFacade {
 		this.contatoDao = new ContatoDao(this.getEntityManager());
 
 		this.telefoneDao = new TelefoneDao(this.getEntityManager());
+
+		this.grupoDao = new GrupoDao(this.getEntityManager());
+
+	}
+
+	@Override
+	public List<Grupo> buscarTodosGrupos() {
+
+		return this.grupoDao.buscarTodos();
 
 	}
 
@@ -114,6 +127,18 @@ public class AgendaFacadeImpl implements AgendaFacade {
 
 	}
 
+	@Override
+	public void flush() {
+
+		this.getEntityManager().flush();
+	}
+
+	@Override
+	public void clear() {
+
+		this.getEntityManager().clear();
+	}
+	
 	/**
 	 * Retorna o valor do atributo <code>entityManager</code>
 	 *
@@ -147,16 +172,6 @@ public class AgendaFacadeImpl implements AgendaFacade {
 	private void rollbackTransaction() {
 
 		this.getEntityManager().getTransaction().rollback();
-	}
-
-	public void flush() {
-
-		this.getEntityManager().flush();
-	}
-
-	public void clear() {
-
-		this.getEntityManager().clear();
 	}
 
 }

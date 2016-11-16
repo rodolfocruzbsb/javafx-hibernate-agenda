@@ -2,10 +2,11 @@
 
 <?import java.lang.*?>
 <?import java.net.*?>
+<?import javafx.collections.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane prefHeight="445.0" prefWidth="706.0" styleClass="background" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="br.com.devmedia.agenda.controller.ContatoCrudController">
+<AnchorPane prefHeight="500.0" prefWidth="706.0" styleClass="background" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="br.com.devmedia.agenda.controller.ContatoCrudController">
   <children>
     <GridPane layoutX="14.0" layoutY="14.0" prefHeight="106.0" prefWidth="672.0">
       <children>
@@ -23,8 +24,41 @@
         <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="14.0" vgrow="SOMETIMES" />
       </rowConstraints>
     </GridPane>
-    <Accordion layoutX="20.0" layoutY="117.0" prefHeight="260.0" prefWidth="677.0">
+    <Accordion layoutX="20.0" layoutY="117.0" prefHeight="300.0" prefWidth="677.0">
       <expandedPane>
+        <TitledPane fx:id="x1" animated="false" prefHeight="-1.0" prefWidth="-1.0" styleClass="background" text="Endereço">
+          <content>
+            <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="229.0" prefWidth="672.0" styleClass="background">
+              <children>
+                <GridPane layoutX="6.0" layoutY="0.0" prefHeight="180.0" prefWidth="635.0" styleClass="background">
+                  <children>
+                    <Label text="Endereço" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                    <Label text="Complemento" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                    <Label text="Número" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                    <Label text="CEP" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                    <TextField fx:id="descricaoField" maxWidth="-1.0" prefHeight="-1.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                    <TextField fx:id="complementoField" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                    <TextField fx:id="numeroField" maxWidth="150.0" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                    <TextField fx:id="cepField" maxWidth="150.0" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                  </children>
+                  <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="333.0" minWidth="10.0" prefWidth="142.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="606.0" minWidth="10.0" prefWidth="493.0" />
+                  </columnConstraints>
+                  <rowConstraints>
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  </rowConstraints>
+                </GridPane>
+              </children>
+            </AnchorPane>
+          </content>
+        </TitledPane>
+      </expandedPane>
+      <panes>
+        <fx:reference source="x1" />
         <TitledPane fx:id="x2" animated="false" prefHeight="-1.0" prefWidth="-1.0" styleClass="background" text="Telefones">
           <content>
             <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" styleClass="background">
@@ -52,7 +86,7 @@
                 </GridPane>
                 <TableView fx:id="telefoneTable" layoutX="6.0" layoutY="57.0" prefHeight="124.0" prefWidth="658.0">
                   <columnResizePolicy>
-                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" fx:id="x3" />
                   </columnResizePolicy>
                   <columns>
                     <TableColumn prefWidth="102.0" text="DDD" fx:id="dddColumn" />
@@ -69,39 +103,51 @@
             <URL value="@DarkTheme.css" />
           </stylesheets>
         </TitledPane>
-      </expandedPane>
-      <panes>
-        <TitledPane fx:id="x1" animated="false" prefHeight="-1.0" prefWidth="-1.0" styleClass="background" text="Endereço">
+        <TitledPane fx:id="x4" animated="false" prefHeight="227.0" prefWidth="-1.0" text="Grupos">
           <content>
-            <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="229.0" prefWidth="672.0" styleClass="background">
+            <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" styleClass="background">
               <children>
-                <GridPane layoutX="6.0" layoutY="0.0" prefHeight="180.0" prefWidth="635.0" styleClass="background">
+                <GridPane layoutX="14.0" layoutY="14.0" prefWidth="650.0">
                   <children>
-                    <Label text="Endereço" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                    <Label text="Complemento" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                    <Label text="Numero" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-                    <Label text="CEP" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-                    <TextField fx:id="descricaoField" maxWidth="-1.0" prefHeight="-1.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-                    <TextField fx:id="complementoField" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                    <TextField fx:id="numeroField" maxWidth="150.0" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                    <TextField fx:id="cepField" maxWidth="150.0" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                    <Label text="Grupo" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                    <Button alignment="CENTER" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#handleAdicionarGrupo" text="Add" textAlignment="LEFT" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                    <Button alignment="CENTER" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#handleDeletarGrupo" text="Del" textAlignment="LEFT" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+                    <ComboBox fx:id="grupoCombobox" editable="false" prefWidth="246.00009999999747" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                      <items>
+                        <FXCollections fx:factory="observableArrayList">
+                          <String fx:value="Item 1" />
+                          <String fx:value="Item 2" />
+                          <String fx:value="Item 3" />
+                        </FXCollections>
+                      </items>
+                    </ComboBox>
                   </children>
                   <columnConstraints>
-                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="333.0" minWidth="10.0" prefWidth="142.0" />
-                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="606.0" minWidth="10.0" prefWidth="493.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="162.0" minWidth="10.0" prefWidth="116.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="351.0" minWidth="10.0" prefWidth="351.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="307.0" minWidth="10.0" prefWidth="92.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="307.0" minWidth="10.0" prefWidth="91.0" />
                   </columnConstraints>
                   <rowConstraints>
                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   </rowConstraints>
                 </GridPane>
+                <TableView fx:id="grupoTable" columnResizePolicy="$x3" layoutX="6.0" layoutY="57.0" prefHeight="124.0" prefWidth="658.0">
+                  <columns>
+                    <TableColumn prefWidth="102.0" text="Nome" fx:id="grupoNomeColumn" />
+                    <TableColumn prefWidth="114.0" text="Descricao" fx:id="grupoDescricaoColumn" />
+                  </columns>
+                </TableView>
               </children>
+              <stylesheets>
+                <URL value="@DarkTheme.css" />
+              </stylesheets>
             </AnchorPane>
           </content>
+          <stylesheets>
+            <URL value="@DarkTheme.css" />
+          </stylesheets>
         </TitledPane>
-        <fx:reference source="x2" />
       </panes>
     </Accordion>
     <HBox spacing="5.0" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="10.0">
