@@ -18,6 +18,8 @@
 			<property name="hibernate.jdbc.wrap_result_sets" value="false" />
 			<property name="hibernate.hibernate.cache.use_query_cache"	value="true" />
 			<property name="hibernate.hbm2ddl.auto" value="update" />
+			<!-- Evitando: INFO - HHH000424: Disabling contextual LOB creation as createClob() method threw error :java.lang.reflect.InvocationTargetException -->
+			<property name="hibernate.temp.use_jdbc_metadata_defaults" value="false" />
 
 			<!-- Configurando o pool de Connection -->
 			<property name="hibernate.c3p0.min_size" value="5" />

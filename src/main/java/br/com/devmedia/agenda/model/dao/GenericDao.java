@@ -13,5 +13,5 @@ public interface GenericDao<T extends Entidade> {
 	void excluir(Long id);
 
 	List<T> buscarTodos();
-
+	
 }

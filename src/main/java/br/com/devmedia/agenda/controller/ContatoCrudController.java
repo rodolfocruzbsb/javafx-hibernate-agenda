@@ -1,11 +1,20 @@
 package br.com.devmedia.agenda.controller;
 
+import java.util.Optional;
+
 import br.com.devmedia.agenda.MainApp;
 import br.com.devmedia.agenda.controller.dto.ContatoDTO;
 import br.com.devmedia.agenda.controller.dto.TelefoneDTO;
+import br.com.devmedia.agenda.model.entidades.Contato;
+import br.com.devmedia.agenda.util.DateUtil;
+import br.com.devmedia.agenda.util.FieldsUtils;
+import br.com.devmedia.service.AgendaFacadeImpl;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -39,57 +48,62 @@ public class ContatoCrudController {
 	@FXML
 	private TableColumn<TelefoneDTO, String> numeroColumn;
 
+	@FXML
+	TextField dddTelefoneField;
+
+	@FXML
+	TextField numeroTelefoneField;
+
 	private MainApp mainApp;
 
 	private ContatoDTO contato;
 
+	private AgendaFacadeImpl facade;
+
 	public ContatoCrudController() {
+
+		this.facade = new AgendaFacadeImpl();
 	}
 
-	/**
-	 * Initializes the controller class. This method is automatically called after the fxml file has been loaded.
-	 */
 	@FXML
 	private void initialize() {
 
-		this.showContatoDetails(this.contato);
+		this.dddColumn.setCellValueFactory(cellData -> cellData.getValue().getDddStringProperty());
 
-		dddColumn.setCellValueFactory(cellData -> cellData.getValue().getDddStringProperty());
+		this.numeroColumn.setCellValueFactory(cellData -> cellData.getValue().getNumeroStringProperty());
 
-		numeroColumn.setCellValueFactory(cellData -> cellData.getValue().getNumeroStringProperty());
+		FieldsUtils.numericField(this.numeroField);
+		FieldsUtils.maxField(this.numeroField, 9);
+
+		FieldsUtils.maxField(this.cepField, 9);
+
+		FieldsUtils.numericField(this.dddTelefoneField);
+		FieldsUtils.maxField(this.dddTelefoneField, 2);
+
+		FieldsUtils.numericField(this.numeroTelefoneField);
+		FieldsUtils.maxField(this.numeroTelefoneField, 9);
+
+		FieldsUtils.dateField(this.dataNascimentoField);
 
 	}
 
-	/**
-	 * Is called by the main application to give a reference back to itself.
-	 * 
-	 * @param mainApp
-	 */
-	public void setMainApp(MainApp mainApp) {
+	public void setMainApp(final MainApp mainApp) {
 
 		this.mainApp = mainApp;
 
 	}
 
-	/**
-	 * Fills all text fields to show details about the Contato. If the specified Contato is null, all text fields are cleared.
-	 * 
-	 * @param contato
-	 *            the Contato or null
-	 */
-	private void showContatoDetails(ContatoDTO contato) {
+	private void showContatoDetails(final ContatoDTO contato) {
 
-		if (contato != null) {
-			nomeField.setText(contato.getNome());
-			dataNascimentoField.setText(contato.getDataNascimentoString());
+		this.nomeField.textProperty().bindBidirectional(contato.getNomeProperty());
+
+		this.dataNascimentoField.setText(contato.getDataNascimentoString());
+
+		if (contato != null && contato.getId() != null) {
 
 			this.preencherEndereco();
 
 			this.preencherTelefones();
-		} else {
-
-			nomeField.setText("");
-			dataNascimentoField.setText("");
 		}
 	}
 
@@ -97,9 +111,10 @@ public class ContatoCrudController {
 
 		if (this.contato != null && this.contato.getEndereco() != null) {
 			this.descricaoField.setText(this.contato.getEndereco().getDescricao());
-			this.complementoField.setText(this.contato.getEndereco().getComplemento());
-			this.cepField.setText(String.valueOf(this.contato.getEndereco().getCep()));
-			this.numeroField.setText(this.contato.getEndereco().getNumero());
+			this.descricaoField.textProperty().bindBidirectional(this.contato.getEndereco().getDescricaoProperty());
+			this.complementoField.textProperty().bindBidirectional(this.contato.getEndereco().getComplementoProperty());
+			this.cepField.textProperty().bindBidirectional(this.contato.getEndereco().getCepProperty());
+			this.numeroField.textProperty().bindBidirectional(this.contato.getEndereco().getNumeroProperty());
 
 		}
 
@@ -107,9 +122,15 @@ public class ContatoCrudController {
 
 	private void preencherTelefones() {
 
-		if (this.contato != null && this.contato.getTelefones() != null && !this.contato.getTelefones().isEmpty()) {
+		if (this.contato != null
+
+				&& this.contato.getTelefones() != null
+
+				&& !this.contato.getTelefones().isEmpty()) {
+
 			final ObservableList<TelefoneDTO> telefoneData = FXCollections.observableArrayList();
-			telefoneData.addAll(contato.getTelefones());
+
+			telefoneData.addAll(this.contato.getTelefones());
 
 			this.telefoneTable.setItems(telefoneData);
 		}
@@ -119,15 +140,161 @@ public class ContatoCrudController {
 	@FXML
 	private void handleSalvar() {
 
+		try {
+
+			this.contato.setDataNascimento(DateUtil.parse(this.dataNascimentoField.getText()));
+
+			this.contato.setTelefones(telefoneTable.getItems());
+
+			if (this.validarContato()) {
+
+				final Contato entidade = this.contato.getEntidadeSincronizada();
+			
+				this.facade.salvarContato(entidade);
+				
+				this.mainApp.showContatoOverview();
+			}
+		} catch (Exception e) {
+
+			e.printStackTrace();
+
+			this.mainApp.alertException(e);
+
+		}
+
+	}
+
+	private boolean validarContato() {
+
+		StringBuilder msgValidacao = new StringBuilder();
+
+		if (this.contato.getNome() == null || this.contato.getNome().trim().length() == 0) {
+
+			msgValidacao.append("Campo Nome é obrigatório.").append("\n");
+		}
+
+		if (this.contato.getDataNascimento() == null) {
+
+			msgValidacao.append("Campo Dt. Nascimento é inválido.").append("\n");
+		}
+
+		if (this.contato.temEndereco()) {
+
+			if (this.contato.getEndereco().getCep() == null || this.contato.getEndereco().getCep().trim().length() == 0) {
+
+				msgValidacao.append("Campo Endereço -> Cep é obrigatório.").append("\n");
+			}
+
+			if (this.contato.getEndereco().getDescricao() == null || this.contato.getEndereco().getDescricao().trim().length() == 0) {
+
+				msgValidacao.append("Campo Endereço -> Descrição é obrigatório.").append("\n");
+			}
+
+			if (this.contato.getEndereco().getNumero() == null || this.contato.getEndereco().getNumero().trim().length() == 0) {
+
+				msgValidacao.append("Campo Endereço -> Número é obrigatório.").append("\n");
+			}
+		}
+
+		if (msgValidacao.length() > 0) {
+
+			final Alert alert = new Alert(AlertType.ERROR);
+
+			alert.setTitle("Erro");
+
+			alert.setHeaderText("Foram encontrados erros no seu formulário");
+
+			alert.setContentText(msgValidacao.toString());
+
+			alert.setResizable(true);
+
+			alert.getDialogPane().setPrefWidth(500);
+
+			alert.showAndWait();
+
+			return false;
+		}
+
+		return true;
+
 	}
 
 	@FXML
 	private void handleCancelar() {
 
-		mainApp.showContatoOverview();
+		this.mainApp.showContatoOverview();
 	}
 
-	public void setContrato(ContatoDTO contato) {
+	@FXML
+	private void handleDeletarTelefone() {
+
+		final int index = this.telefoneTable.getSelectionModel().getSelectedIndex();
+
+		if (index >= 0) {
+			final Alert alert = new Alert(AlertType.CONFIRMATION);
+			alert.setTitle("Confirmação");
+			alert.setHeaderText("Você está prestes a excluir o registro.");
+			alert.setContentText("Deseja continuar esta operação?");
+
+			final Optional<ButtonType> result = alert.showAndWait();
+			if (result.get() == ButtonType.OK) {
+				this.telefoneTable.getItems().remove(index);
+			}
+
+		} else {
+
+			this.mainApp.alertNenhumItemSelecionado();
+		}
+	}
+
+	@FXML
+	public void handleAdicionarTelefone() {
+
+		if (this.validarDadosTelefone()) {
+
+			this.telefoneTable.getItems().add(new TelefoneDTO(null, Long.valueOf(this.dddTelefoneField.getText()), Long.valueOf(this.numeroTelefoneField.getText())));
+		}
+
+	}
+
+	private boolean validarDadosTelefone() {
+
+		final StringBuilder msgValidacao = new StringBuilder();
+
+		if (this.dddTelefoneField.getText() == null || this.dddTelefoneField.getText().trim().length() == 0) {
+
+			msgValidacao.append("Campo DDD é obrigatório").append("\n");
+		}
+
+		if (this.numeroTelefoneField.getText() == null || this.numeroTelefoneField.getText().trim().length() == 0) {
+
+			msgValidacao.append("Campo Número é obrigatório").append("\n");
+		}
+
+		if (msgValidacao.length() > 0) {
+
+			final Alert alert = new Alert(AlertType.ERROR);
+
+			alert.setTitle("Erro");
+
+			alert.setHeaderText("Foram encontrados erros no seu formulário");
+
+			alert.setContentText(msgValidacao.toString());
+
+			alert.setResizable(true);
+
+			alert.getDialogPane().setPrefWidth(500);
+
+			alert.showAndWait();
+
+			return false;
+		}
+
+		return true;
+
+	}
+
+	public void setContrato(final ContatoDTO contato) {
 
 		this.contato = contato;
 
@@ -140,60 +307,60 @@ public class ContatoCrudController {
 
 	public TextField getNomeField() {
 
-		return nomeField;
+		return this.nomeField;
 	}
 
-	public void setNomeField(TextField nomeField) {
+	public void setNomeField(final TextField nomeField) {
 
 		this.nomeField = nomeField;
 	}
 
 	public TextField getDataNascimentoField() {
 
-		return dataNascimentoField;
+		return this.dataNascimentoField;
 	}
 
-	public void setDataNascimentoField(TextField dataNascimentoField) {
+	public void setDataNascimentoField(final TextField dataNascimentoField) {
 
 		this.dataNascimentoField = dataNascimentoField;
 	}
 
 	public TextField getDescricaoField() {
 
-		return descricaoField;
+		return this.descricaoField;
 	}
 
-	public void setDescricaoField(TextField descricaoField) {
+	public void setDescricaoField(final TextField descricaoField) {
 
 		this.descricaoField = descricaoField;
 	}
 
 	public TextField getNumeroField() {
 
-		return numeroField;
+		return this.numeroField;
 	}
 
-	public void setNumeroField(TextField numeroField) {
+	public void setNumeroField(final TextField numeroField) {
 
 		this.numeroField = numeroField;
 	}
 
 	public TextField getCepField() {
 
-		return cepField;
+		return this.cepField;
 	}
 
-	public void setCepField(TextField cepField) {
+	public void setCepField(final TextField cepField) {
 
 		this.cepField = cepField;
 	}
 
 	public TextField getComplementoField() {
 
-		return complementoField;
+		return this.complementoField;
 	}
 
-	public void setComplementoField(TextField complementoField) {
+	public void setComplementoField(final TextField complementoField) {
 
 		this.complementoField = complementoField;
 	}

@@ -9,7 +9,7 @@ public class RootLayoutController {
 
 	private MainApp mainApp;
 
-	public void setMainApp(MainApp mainApp) {
+	public void setMainApp(final MainApp mainApp) {
 
 		this.mainApp = mainApp;
 	}
@@ -22,10 +22,14 @@ public class RootLayoutController {
 	@FXML
 	private void handleAbout() {
 
-		Alert alert = new Alert(AlertType.INFORMATION);
+		final Alert alert = new Alert(AlertType.INFORMATION);
+
 		alert.setTitle("Agenda");
+
 		alert.setHeaderText("Sobre");
+
 		alert.setContentText("Author: DevMedia\nWebsite: http://www.devmedia.com.br");
+
 		alert.showAndWait();
 	}
 

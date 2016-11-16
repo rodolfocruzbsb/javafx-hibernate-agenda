@@ -1,13 +1,15 @@
 package br.com.devmedia.agenda.controller.dto;
 
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
+import br.com.devmedia.agenda.model.entidades.Contato;
+import br.com.devmedia.agenda.model.entidades.Endereco;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class EnderecoDTO {
 
-	private final IntegerProperty cep = new SimpleIntegerProperty();
+	private Endereco entidade;
+
+	private final StringProperty cep = new SimpleStringProperty();
 
 	private final StringProperty complemento = new SimpleStringProperty();
 
@@ -19,7 +21,9 @@ public class EnderecoDTO {
 
 	}
 
-	public EnderecoDTO( Integer cep, String complemento, String numero, String descricao ) {
+	public EnderecoDTO( final Endereco entidade, final String cep, final String complemento, final String numero, final String descricao ) {
+
+		this.entidade = entidade;
 
 		this.cep.set(cep);
 
@@ -31,17 +35,17 @@ public class EnderecoDTO {
 
 	}
 
-	public Integer getCep() {
+	public String getCep() {
 
 		return cep.get();
 	}
 
-	public void setCep(Integer cep) {
+	public void setCep(String cep) {
 
 		this.cep.set(cep);
 	}
 
-	public IntegerProperty getCepProperty() {
+	public StringProperty getCepProperty() {
 
 		return cep;
 	}
@@ -89,6 +93,69 @@ public class EnderecoDTO {
 	public StringProperty getDescricaoProperty() {
 
 		return descricao;
+	}
+
+	public static EnderecoDTO from(Endereco endereco) {
+
+		EnderecoDTO result = null;
+
+		if (endereco != null) {
+
+			result = new EnderecoDTO(endereco, endereco.getCep(), endereco.getComplemento(), endereco.getNumero(), endereco.getDescricao());
+		}
+
+		return result;
+	}
+
+	public boolean estaPreenchido() {
+
+		return ( (this.getCep() != null && this.getCep().trim().length() > 0)
+
+				|| (this.getComplemento() != null && this.getComplemento().trim().length() > 0)
+
+				|| (this.getDescricao() != null && this.getDescricao().trim().length() > 0)
+
+				|| (this.getNumero() != null && this.getNumero().trim().length() > 0) );
+	}
+
+	public Endereco getEntidadeSincronizada(Contato contato) {
+
+		if (this.estaPreenchido()) {
+
+			entidade = entidade != null ? entidade : new Endereco();
+
+			entidade.setCep(getCep());
+
+			entidade.setComplemento(getComplemento());
+
+			entidade.setDescricao(getDescricao());
+
+			entidade.setNumero(getNumero());
+
+			entidade.setContato(contato);
+		}
+
+		return entidade;
+	}
+
+	/**
+	 * Retorna o valor do atributo <code>entidade</code>
+	 *
+	 * @return <code>Endereco</code>
+	 */
+	public Endereco getEntidade() {
+
+		return entidade;
+	}
+
+	/**
+	 * Define o valor do atributo <code>entidade</code>.
+	 *
+	 * @param entidade
+	 */
+	public void setEntidade(Endereco entidade) {
+
+		this.entidade = entidade;
 	}
 
 }

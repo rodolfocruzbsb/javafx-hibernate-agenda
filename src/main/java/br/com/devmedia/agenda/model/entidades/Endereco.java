@@ -162,4 +162,18 @@ public class Endereco extends Entidade {
 		this.contato = contato;
 	}
 
+	/**
+	 * Descrição Padrão: <br>
+	 * <br>
+	 *
+	 * {@inheritDoc}
+	 *
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+
+		return "Endereco [id=" + id + ", cep=" + cep + ", complemento=" + complemento + ", numero=" + numero + ", descricao=" + descricao + "]";
+	}
+
 }

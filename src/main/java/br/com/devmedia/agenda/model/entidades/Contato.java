@@ -3,6 +3,7 @@ package br.com.devmedia.agenda.model.entidades;
 import java.util.Collection;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,6 +17,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.UniqueConstraint;
 
 /**
  * <p>
@@ -53,8 +55,8 @@ public class Contato extends Entidade {
 	@Column(name = "dt_nascimento", nullable = false)
 	private Date dataNascimento;
 
-	@OneToOne(optional = true)
-	@JoinColumn(name = "fk_endereco")
+	@OneToOne(optional = true, cascade = CascadeType.ALL)
+	@JoinColumn(name = "fk_endereco", unique = true)
 	private Endereco endereco;
 
 	@OneToMany(mappedBy = "contato")
@@ -63,9 +65,11 @@ public class Contato extends Entidade {
 	@ManyToMany
 	@JoinTable(name = "ass_grupo_contato",
 
-			joinColumns = @JoinColumn(name = "id_contato"),
+			uniqueConstraints = @UniqueConstraint(columnNames = { "id_contato", "id_grupo" }),
 
-			inverseJoinColumns = @JoinColumn(name = "id_grupo")
+			joinColumns = @JoinColumn(name = "id_contato", nullable = false),
+
+			inverseJoinColumns = @JoinColumn(name = "id_grupo", nullable = false)
 
 	)
 	private Collection<Grupo> grupos;
@@ -188,6 +192,20 @@ public class Contato extends Entidade {
 	public void setGrupos(Collection<Grupo> grupos) {
 
 		this.grupos = grupos;
+	}
+
+	/**
+	 * Descrição Padrão: <br>
+	 * <br>
+	 *
+	 * {@inheritDoc}
+	 *
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+
+		return "Contato [id=" + id + ", nome=" + nome + ", dataNascimento=" + dataNascimento + ", endereco=" + endereco + "]";
 	}
 
 }

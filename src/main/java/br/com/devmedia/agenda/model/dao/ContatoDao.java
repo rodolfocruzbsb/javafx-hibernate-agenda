@@ -1,5 +1,7 @@
 package br.com.devmedia.agenda.model.dao;
 
+import javax.persistence.EntityManager;
+
 import br.com.devmedia.agenda.model.entidades.Contato;
 
 /**
@@ -20,5 +22,11 @@ import br.com.devmedia.agenda.model.entidades.Contato;
  * @version 1.0.0
  */
 public class ContatoDao extends GenericDaoImpl<Contato> {
+	
+	
+	public ContatoDao(EntityManager entityManager) {
+		
+		super(entityManager);
+	}
 
 }

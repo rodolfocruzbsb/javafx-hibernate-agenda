@@ -128,4 +128,18 @@ public class Telefone extends Entidade {
 		this.contato = contato;
 	}
 
+	/**
+	 * Descrição Padrão: <br> <br>
+	 *
+	 * {@inheritDoc}
+	 *
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+
+		return "Telefone [id=" + id + ", ddd=" + ddd + ", numero=" + numero + "]";
+	}
+
+	
 }

@@ -7,7 +7,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import br.com.devmedia.agenda.model.entidades.Entidade;
-import br.com.devmedia.agenda.util.FabricaDeEntityManager;
 
 /**
  * <p>
@@ -29,12 +28,15 @@ import br.com.devmedia.agenda.util.FabricaDeEntityManager;
  */
 public abstract class GenericDaoImpl<T extends Entidade> implements GenericDao<T> {
 
-	protected EntityManager entityManager = FabricaDeEntityManager.getEntityManager();
+	private EntityManager entityManager;
 
 	private final Class<T> clazz;
 
 	@SuppressWarnings("unchecked")
-	public GenericDaoImpl() {
+	public GenericDaoImpl( EntityManager entityManager ) {
+
+		this.entityManager = entityManager;
+
 		this.clazz = (Class<T>) ( (ParameterizedType) this.getClass().getGenericSuperclass() ).getActualTypeArguments()[0];
 	}
 
@@ -42,7 +44,7 @@ public abstract class GenericDaoImpl<T extends Entidade> implements GenericDao<T
 	@Override
 	public List<T> buscarTodos() {
 
-		final Query query = this.entityManager.createQuery("select x from " + this.clazz.getName() + "order by id");
+		final Query query = this.getEntityManager().createQuery("select x from " + this.clazz.getName() + " x order by id");
 
 		return query.getResultList();
 	}
@@ -56,7 +58,7 @@ public abstract class GenericDaoImpl<T extends Entidade> implements GenericDao<T
 
 		if (entity != null) {
 
-			this.entityManager.remove(entity);
+			this.getEntityManager().remove(entity);
 		}
 
 	}
@@ -66,10 +68,10 @@ public abstract class GenericDaoImpl<T extends Entidade> implements GenericDao<T
 
 		if (entity == null || entity.getId() == null) {
 
-			this.entityManager.persist(entity);
+			this.getEntityManager().persist(entity);
 		} else {
 
-			this.entityManager.merge(entity);
+			this.getEntityManager().merge(entity);
 		}
 
 		return entity;
@@ -80,7 +82,7 @@ public abstract class GenericDaoImpl<T extends Entidade> implements GenericDao<T
 
 		this.verificaParametroID(id);
 
-		return this.entityManager.find(this.clazz, id);
+		return this.getEntityManager().find(this.clazz, id);
 	}
 
 	private void verificaParametroID(final Long id) {
@@ -90,4 +92,15 @@ public abstract class GenericDaoImpl<T extends Entidade> implements GenericDao<T
 			throw new IllegalArgumentException("ID não pode ser nulo!");
 		}
 	}
+
+	/**
+	 * Retorna o valor do atributo <code>entityManager</code>
+	 *
+	 * @return <code>EntityManager</code>
+	 */
+	public EntityManager getEntityManager() {
+
+		return entityManager;
+	}
+
 }

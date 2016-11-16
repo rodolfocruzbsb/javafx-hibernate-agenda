@@ -1,5 +1,7 @@
 package br.com.devmedia.agenda.model.dao;
 
+import javax.persistence.EntityManager;
+
 import br.com.devmedia.agenda.model.entidades.Grupo;
 
 /**
@@ -21,4 +23,8 @@ import br.com.devmedia.agenda.model.entidades.Grupo;
  */
 public class GrupoDao extends GenericDaoImpl<Grupo> {
 
+	public GrupoDao( EntityManager entityManager ) {
+
+		super(entityManager);
+	}
 }

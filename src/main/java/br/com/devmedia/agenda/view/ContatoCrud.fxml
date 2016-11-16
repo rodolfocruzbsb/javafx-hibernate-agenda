@@ -33,16 +33,18 @@
                   <children>
                     <Label text="DDD" GridPane.columnIndex="0" GridPane.rowIndex="0" />
                     <Label text="Numero" GridPane.columnIndex="2" GridPane.rowIndex="0" />
-                    <TextField maxWidth="80.0" prefWidth="80.0" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-                    <TextField maxWidth="100.0" prefWidth="100.0" GridPane.columnIndex="3" GridPane.rowIndex="0" />
-                    <Button alignment="CENTER" contentDisplay="RIGHT" mnemonicParsing="false" text="Add" textAlignment="LEFT" GridPane.columnIndex="4" GridPane.rowIndex="0" />
+                    <TextField fx:id="dddTelefoneField" maxWidth="80.0" prefWidth="80.0" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                    <TextField fx:id="numeroTelefoneField" maxWidth="150.0" prefWidth="150.0" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+                    <Button alignment="CENTER" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#handleAdicionarTelefone" text="Add" textAlignment="LEFT" GridPane.columnIndex="4" GridPane.rowIndex="0" />
+                    <Button alignment="CENTER" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#handleDeletarTelefone" text="Del" textAlignment="LEFT" GridPane.columnIndex="5" GridPane.rowIndex="0" />
                   </children>
                   <columnConstraints>
                     <ColumnConstraints hgrow="SOMETIMES" maxWidth="162.0" minWidth="10.0" prefWidth="50.0" />
-                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="285.0" minWidth="10.0" prefWidth="143.0" />
-                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="162.0" minWidth="10.0" prefWidth="81.0" />
-                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="353.0" minWidth="10.0" prefWidth="264.0" />
-                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="307.0" minWidth="10.0" prefWidth="112.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="285.0" minWidth="10.0" prefWidth="109.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="162.0" minWidth="10.0" prefWidth="67.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="353.0" minWidth="10.0" prefWidth="194.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="307.0" minWidth="10.0" prefWidth="115.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="307.0" minWidth="10.0" prefWidth="115.0" />
                   </columnConstraints>
                   <rowConstraints>
                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -53,8 +55,8 @@
                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                   </columnResizePolicy>
                   <columns>
-                    <TableColumn prefWidth="102.0" text="DDD" fx:id="dddColumn"/>
-                    <TableColumn prefWidth="114.0" text="Número" fx:id="numeroColumn"/>
+                    <TableColumn prefWidth="102.0" text="DDD" fx:id="dddColumn" />
+                    <TableColumn prefWidth="114.0" text="Número" fx:id="numeroColumn" />
                   </columns>
                 </TableView>
               </children>

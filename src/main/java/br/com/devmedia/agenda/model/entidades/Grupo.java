@@ -128,4 +128,18 @@ public class Grupo extends Entidade {
 		this.contatos = contatos;
 	}
 
+	/**
+	 * Descrição Padrão: <br>
+	 * <br>
+	 *
+	 * {@inheritDoc}
+	 *
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+
+		return "Grupo [id=" + id + ", nome=" + nome + ", descricao=" + descricao + "]";
+	}
+
 }

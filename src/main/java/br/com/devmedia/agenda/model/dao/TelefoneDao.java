@@ -1,5 +1,7 @@
 package br.com.devmedia.agenda.model.dao;
 
+import javax.persistence.EntityManager;
+
 import br.com.devmedia.agenda.model.entidades.Telefone;
 
 /**
@@ -21,4 +23,8 @@ import br.com.devmedia.agenda.model.entidades.Telefone;
  */
 public class TelefoneDao extends GenericDaoImpl<Telefone> {
 
+	public TelefoneDao( EntityManager entityManager ) {
+
+		super(entityManager);
+	}
 }

@@ -1,14 +1,22 @@
 package br.com.devmedia.agenda.controller;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import br.com.devmedia.agenda.MainApp;
 import br.com.devmedia.agenda.controller.dto.ContatoDTO;
 import br.com.devmedia.agenda.controller.dto.TelefoneDTO;
+import br.com.devmedia.agenda.model.entidades.Contato;
 import br.com.devmedia.agenda.util.DateUtil;
+import br.com.devmedia.service.AgendaFacadeImpl;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -38,7 +46,7 @@ public class ContatoOverviewController {
 
 	@FXML
 	private Label dataNascimentoLabel;
-	
+
 	/*
 	 * ENDERECO
 	 */
@@ -47,49 +55,62 @@ public class ContatoOverviewController {
 
 	@FXML
 	private Label complementoLabel;
-	
+
 	@FXML
 	private Label cepLabel;
-	
+
 	@FXML
 	private Label numeroLabel;
-	
+
 	private MainApp mainApp;
 
+	private final ObservableList<ContatoDTO> contatos = FXCollections.observableArrayList();
+
+	private AgendaFacadeImpl facade;
+
 	public ContatoOverviewController() {
+		this.facade = new AgendaFacadeImpl();
+
 	}
 
 	@FXML
 	private void initialize() {
 
-		nomeColumn.setCellValueFactory(cellData -> cellData.getValue().getNomeProperty());
+		this.carregarContatosDoBanco();
 
-		dataNascimentoColumn.setCellValueFactory(cellData -> cellData.getValue().getDataNascimentoStringProperty());
-		
-		dddColumn.setCellValueFactory(cellData -> cellData.getValue().getDddStringProperty());
-		
-		numeroColumn.setCellValueFactory(cellData -> cellData.getValue().getNumeroStringProperty());
+		this.carregarTela();
 
-		showContatoDetails(null);
-
-		contatoTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> showContatoDetails(newValue));
 	}
 
-	public void setMainApp(MainApp mainApp) {
+	private void enviarContatosParaTela(final Collection<Contato> contatosEntity) {
+
+		this.contatos.addAll(contatosEntity.stream().map(c -> ContatoDTO.from(c)).collect(Collectors.toList()));
+
+		this.contatoTable.setItems(this.contatos);
+	}
+
+	private void carregarTela() {
+
+		this.nomeColumn.setCellValueFactory(cellData -> cellData.getValue().getNomeProperty());
+
+		this.dataNascimentoColumn.setCellValueFactory(cellData -> cellData.getValue().getDataNascimentoStringProperty());
+
+		this.dddColumn.setCellValueFactory(cellData -> cellData.getValue().getDddStringProperty());
+
+		this.numeroColumn.setCellValueFactory(cellData -> cellData.getValue().getNumeroStringProperty());
+
+		this.detalharContatoSelecionado(null);
+
+		this.contatoTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> this.detalharContatoSelecionado(newValue));
+	}
+
+	public void setMainApp(final MainApp mainApp) {
 
 		this.mainApp = mainApp;
 
-		contatoTable.setItems(mainApp.getContatoData());
-		
 	}
 
-	/**
-	 * Fills all text fields to show details about the Contato. If the specified Contato is null, all text fields are cleared.
-	 * 
-	 * @param contato
-	 *            the Contato or null
-	 */
-	private void showContatoDetails(ContatoDTO contato) {
+	private void detalharContatoSelecionado(final ContatoDTO contato) {
 
 		if (contato != null) {
 
@@ -97,12 +118,12 @@ public class ContatoOverviewController {
 			this.dataNascimentoLabel.setText(DateUtil.format(contato.getDataNascimento()));
 			this.enderecoLabel.setText(contato.getEndereco().getDescricao());
 			this.complementoLabel.setText(contato.getEndereco().getComplemento());
-			this.cepLabel.setText(String.valueOf(contato.getEndereco().getCep()));
+			this.cepLabel.setText(contato.getEndereco().getCep());
 			this.numeroLabel.setText(contato.getEndereco().getNumero());
-			
+
 			final ObservableList<TelefoneDTO> telefoneData = FXCollections.observableArrayList();
 			telefoneData.addAll(contato.getTelefones());
-			
+
 			this.telefoneTable.setItems(telefoneData);
 		} else {
 
@@ -118,45 +139,52 @@ public class ContatoOverviewController {
 	@FXML
 	private void handleDeleteContato() {
 
-		int selectedIndex = contatoTable.getSelectionModel().getSelectedIndex();
+		final ContatoDTO selectedContato = this.contatoTable.getSelectionModel().getSelectedItem();
 
-		if (selectedIndex >= 0) {
+		if (selectedContato != null) {
+			final Alert alert = new Alert(AlertType.CONFIRMATION);
+			alert.setTitle("Confirmação");
+			alert.setHeaderText("Você está prestes a excluir o registro.");
+			alert.setContentText("Deseja continuar esta operação?");
 
-			contatoTable.getItems().remove(selectedIndex);
+			final Optional<ButtonType> result = alert.showAndWait();
+			if (result.get() == ButtonType.OK) {
+				System.out.println("Excluiu!!!");
+			}
+
 		} else {
 
-			alertNenhumItemSelecionado();
+			this.mainApp.alertNenhumItemSelecionado();
 		}
+
 	}
 
 	@FXML
 	private void handleNewContato() {
 
-		mainApp.showContatoEditDialog(new ContatoDTO());
+		this.mainApp.showContatoEdit(new ContatoDTO());
 	}
 
 	@FXML
 	private void handleEditContato() {
 
-		ContatoDTO selectedContato = contatoTable.getSelectionModel().getSelectedItem();
+		final ContatoDTO selectedContato = this.contatoTable.getSelectionModel().getSelectedItem();
+
 		if (selectedContato != null) {
 
-			mainApp.showContatoEditDialog(selectedContato);
+			this.mainApp.showContatoEdit(selectedContato);
 		} else {
 
-			alertNenhumItemSelecionado();
+			this.mainApp.alertNenhumItemSelecionado();
 		}
 	}
 
-	private void alertNenhumItemSelecionado() {
+	private void carregarContatosDoBanco() {
 
-		Alert alert = new Alert(AlertType.WARNING);
-		alert.setTitle("Nenhum Item foi selecionado");
-		alert.setHeaderText("Nenhum contato foi selecionado");
-		alert.setContentText("Por favor, selecione um contato para realizar esta ação.");
-		alert.setResizable(true);
-		alert.getDialogPane().setPrefWidth(500);
-		alert.showAndWait();
+		final List<Contato> contatosEntity = this.facade.buscarTodosContatos();
+
+		this.enviarContatosParaTela(contatosEntity);
+
 	}
-	
+
 }
